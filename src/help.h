@@ -8,8 +8,13 @@
 
 char *cut_file_path(const char *path)
 {
-	char *str, *last, *ptr;
-	str = (char *) malloc(strlen(path));
+	char *last, *ptr;
+	char *str = (char *) malloc(strlen(path));
+
+	if (str == NULL) {
+		fprintf(stderr, "cut_file_path(): str is null after malloc\n");
+		return (char*)path;
+	}
 	strcpy(str, path);
 	
 	ptr = strtok(str, PATH_SEPARATORS);

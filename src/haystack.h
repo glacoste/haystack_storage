@@ -25,10 +25,11 @@ FileInfo *finfo_list;
 
 void haystack_init(void);
 void haystack_close(void);
-void haystack_list_resize(size_t new_size);
 void haystack_list_show(void);
 int  haystack_add_file(const char *new_fname);
 int  haystack_get_file(char *fname, const char *out_fname);
+
+void haystack_list_resize(size_t new_size);
 FileInfo* haystack_get_finfo(char *fname);
 
 #endif

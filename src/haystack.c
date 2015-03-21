@@ -59,12 +59,6 @@ void haystack_close(void)
 	close(blob_fd);
 }
 
-void haystack_list_resize(size_t new_size)
-{
-	finfo_list = realloc(finfo_list, sizeof(FileInfo)*new_size);
-	finfo_list_cap = new_size;
-}
-
 void haystack_list_show(void)
 {
 	size_t i;
@@ -115,11 +109,19 @@ int haystack_add_file(const char *new_fname)
 		haystack_list_resize(finfo_list_size*DEFAULT_LIST_INCR);
 	
 	/* --- adding to file info list --- */
+	if (finfo_list == NULL) {
+		fprintf(stderr, "haystack_add_file(): finfo_list ptr is NULL\n");
+		return 0;
+	}
 	finfo 		= &finfo_list[finfo_list_size];
 	fname 	    = cut_file_path(new_fname);
 	fname_len   = strlen(fname);
 	
 	finfo->_fname = (char*) malloc(fname_len);
+	if (finfo->_fname == NULL) {
+		fprintf(stderr, "haystack_add_file(): finfo ptr is NULL after malloc\n");
+		return 0;
+	}
 	strcpy(finfo->_fname, fname);
 	finfo->_start = fstart;
 	finfo->_size  = fsize;
@@ -168,8 +170,17 @@ int haystack_get_file(char *fname, const char *out_fname)
 						finfo->_size, n_write_sum);
 		return 0; 
 	}
-	
 	return 1;
+}
+
+void haystack_list_resize(size_t new_size)
+{
+	finfo_list = realloc(finfo_list, sizeof(FileInfo)*new_size);
+	if (finfo_list == NULL) {
+		fprintf(stderr, "haystack_list_resize(): finfo_list ptr is NULL after realloc");
+		exit(1);
+	}
+	finfo_list_cap = new_size;
 }
 
 FileInfo* haystack_get_finfo(char *fname)
