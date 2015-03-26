@@ -3,6 +3,9 @@
 #include "haystack.h"
 #include "help.h"
 
+#define unlikely(expr) 	__builtin_expect(!!(expr), 0)
+#define likely(expr)   	__builtin_expect(!!(expr), 1)
+
 #define  DEFAULT_BUFFER_SIZE  4096
 #define  DEFAULT_PERMISSIONS  0666
 typedef  unsigned char fnlen;
@@ -11,7 +14,7 @@ void haystack_init(void)
 {
 	/* Opening blob file */
 	blob_fd = open(BLOB_FILENAME, O_RDWR, 0);
-	if (blob_fd == -1) {
+	if (unlikely(blob_fd == -1)) {
 		blob_fd = creat(BLOB_FILENAME, DEFAULT_PERMISSIONS);
 		if (blob_fd == -1) {
 			fprintf(stderr, "can not create blob file\n");
@@ -22,7 +25,7 @@ void haystack_init(void)
 	
 	/* Opening blin file */
 	blin_fd = open(BLIN_FILENAME, O_RDWR, 0);
-	if (blin_fd == -1) {
+	if (unlikely(blin_fd == -1)) {
 		blin_fd = creat(BLIN_FILENAME, DEFAULT_PERMISSIONS);
 		if (blin_fd == -1) {
 			fprintf(stderr, "can not create blin file\n");
@@ -105,8 +108,9 @@ int haystack_add_file(const char *new_fname)
 		return 0;
 	}
 	
-	if (finfo_list_size == finfo_list_cap)
+	if (likely(finfo_list_size == finfo_list_cap)) {
 		haystack_list_resize(finfo_list_size*DEFAULT_LIST_INCR);
+	}
 	
 	/* --- adding to file info list --- */
 	if (finfo_list == NULL) {
@@ -127,10 +131,10 @@ int haystack_add_file(const char *new_fname)
 	finfo->_size  = fsize;
 	
 	/* --- adding to blin file --- */
-	write( blin_fd, &fname_len,    sizeof(fname_len)  ); 
-	write( blin_fd, finfo->_fname, fname_len	   	  );
-	write( blin_fd, &fstart, 	     sizeof(fstart)   );
-	write( blin_fd, &fsize,  	     sizeof(fsize)    );
+	write( blin_fd, &fname_len,    sizeof(fname_len) ); 
+	write( blin_fd, finfo->_fname, fname_len	   	 );
+	write( blin_fd, &fstart, 	   sizeof(fstart)    );
+	write( blin_fd, &fsize,  	   sizeof(fsize)     );
 	
 	++finfo_list_size;
 	return 1;
