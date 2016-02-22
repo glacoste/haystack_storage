@@ -1,5 +1,5 @@
 # Haystack storage
-The program implements the concept of data storage that keeps all files in one big file (BLOB - big large object) and
+The program implements the concept of data storage that keeps all files in one big file (BLOB - binary large object) and
 information about them (name, size, first byte in BLOB-file) in other file (BLIN).
 
 For now its only for UNIX systems.
